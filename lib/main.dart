@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_crud_demo/homepage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_crud_demo/Screens/homepage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:image_crud_demo/Screens/loginpage.dart';
+import 'package:image_crud_demo/Utilities/routes.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -12,13 +16,29 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: Scaffold(
+        body: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context,snapshot){
+            if(snapshot.connectionState==ConnectionState.waiting){
+              return Center(child: CircularProgressIndicator());
+            }
+            else if(snapshot.hasError){
+              return Center(child: Text("Something Went Wrong"),);
+            }
+            else if(snapshot.hasData){
+              return HomePage();
+            }
+            else{
+              return LoginPage();
+            }
+          },
+        ),
+      )
     );
   }
 }

@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_crud_demo/all_images.dart';
+import 'package:image_crud_demo/Helper/auth_helper.dart';
+import 'package:image_crud_demo/Screens/all_images.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -48,6 +50,7 @@ class _HomePageState extends State<HomePage> {
   XFile? image;
   String DownloadUrl = '';
   List image_list = [];
+  var userid = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +80,7 @@ class _HomePageState extends State<HomePage> {
               final ImagePicker _picker = ImagePicker();
               image = await _picker.pickImage(source: ImageSource.gallery);
               setState(() {
-                imagepath = image!.path.toString();
+                imagepath = image!.path;
                 print(imagepath);
               });
             },
@@ -118,8 +121,10 @@ class _HomePageState extends State<HomePage> {
                  setState(() {});
                 Fluttertoast.showToast(msg: "Image Uploaded Successfully");
                 Fluttertoast.showToast(msg: "${DownloadUrl.toString()}");
-                Map<String, dynamic> imageinfo = {"img_url":DownloadUrl
-                    .toString()};
+                Map<String, dynamic> imageinfo = {
+                  "img_url":DownloadUrl.toString(),
+                  "user_id": userid
+                };
                 firestore.collection('images').add(imageinfo).then((value) =>
                 print("Data Added Successfully"));
               } catch (err) {
@@ -140,6 +145,9 @@ class _HomePageState extends State<HomePage> {
                // });
                // Fluttertoast.showToast(msg: image_list.toString());
                // print(image_list);
+
+              //To give little delay so that all images
+
               Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -151,6 +159,19 @@ class _HomePageState extends State<HomePage> {
               width: MediaQuery.of(context).size.width,
               color: Colors.lightBlue,
               child: Center(child: Text("Show Images")),
+            ),
+          ),
+          SizedBox(height: 20,),
+          GestureDetector(
+            onTap: (){
+              Authentiacation().SignOut();
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 50),
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.lightBlue,
+              child: Center(child: Text("Sign Out")),
             ),
           ),
         ],
