@@ -27,6 +27,11 @@ class MyApp extends StatelessWidget {
             if(snapshot.connectionState==ConnectionState.waiting){
               return Center(child: CircularProgressIndicator());
             }
+            else if(snapshot.connectionState==ConnectionState.none){
+              Fluttertoast.showToast(msg: "Check Your Internet");
+              return Center(child: CircularProgressIndicator());
+
+            }
             else if(snapshot.hasError){
               return Center(child: Text("Something Went Wrong"),);
             }

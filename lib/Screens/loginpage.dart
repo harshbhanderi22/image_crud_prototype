@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_crud_demo/Helper/auth_helper.dart';
 import 'package:image_crud_demo/Screens/homepage.dart';
 import 'package:image_crud_demo/Utilities/routes.dart';
@@ -19,6 +22,26 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _passwordcontroller = TextEditingController();
   final _formkey = GlobalKey<FormState>();
 
+  bool ActiveConnection = false;
+  String T = "";
+  Future CheckUserConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          ActiveConnection = true;
+          T = "Turn off the data and repress again";
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        ActiveConnection = false;
+        T = "Turn On the data and repress again";
+      });
+    }
+  }
+
+
   void moveToHome(BuildContext context) async
   {
     if(_formkey.currentState!.validate()) {
@@ -32,15 +55,17 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
   }
+
+
   @override
   void initState() {
-
+    CheckUserConnection();
   }
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: MaterialApp(
+        showPerformanceOverlay: false,
         color: Colors.white,
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -127,13 +152,22 @@ class _LoginPageState extends State<LoginPage> {
                         InkWell(
                           onTap: () async{
 
-                            //For Login
-                            Authentiacation().login(
-                              _emailcontroller.text,
-                              _passwordcontroller.text
-                            ).then((value) =>  Navigator.pushReplacement
-                              (context, MaterialPageRoute(builder: (context)
-                            => HomePage())));
+                            //Check Connectivity of User
+                            CheckUserConnection();
+                            if(ActiveConnection==false){
+                              Fluttertoast.showToast(msg: "Something went wrong! Check your Internet");
+                            }
+                            else{
+                              //For Login
+                              Authentiacation().login(
+                                  _emailcontroller.text,
+                                  _passwordcontroller.text
+                              ).then((value) =>  Navigator.pushReplacement
+                                (context, MaterialPageRoute(builder: (context)
+                              => HomePage())));
+                            }
+
+
 
                             //For Registration
                             // LoginAuthentiacation().Signup(

@@ -3,14 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
-class DisplayImages extends StatefulWidget {
+class DisplayUserImages extends StatefulWidget {
   @override
-  State<DisplayImages> createState() => _DisplayImagesState();
+  State<DisplayUserImages> createState() => _DisplayUserImagesState();
 }
 
-class _DisplayImagesState extends State<DisplayImages> {
+class _DisplayUserImagesState extends State<DisplayUserImages> {
 
-   var userid = FirebaseAuth.instance.currentUser!.uid;
+  var userid = FirebaseAuth.instance.currentUser!.uid;
   var image_data;
 
 
@@ -18,11 +18,13 @@ class _DisplayImagesState extends State<DisplayImages> {
   void initState() {
     super.initState();
     //To load image at init time else red screen will be displayed
-    image_data=  FirebaseFirestore.instance.collection('images').snapshots();
+    image_data=  FirebaseFirestore.instance.collection('images')
+        .snapshots();
+
    }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     //============
     //Declared in Build method so that it can become empty everytime else
     // same photos will be added in list everytime screen restarted
@@ -32,6 +34,9 @@ class _DisplayImagesState extends State<DisplayImages> {
       body: StreamBuilder(
         stream: image_data,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if(snapshot.hasData==false){
+            return Center(child: CircularProgressIndicator());
+          }
           for(int i=0;i<snapshot.data.docs.length;i++){
             if(snapshot.data.docs[i]['user_id']==userid){
               user_images.add(snapshot.data.docs[i]['img_url']);
@@ -50,12 +55,16 @@ class _DisplayImagesState extends State<DisplayImages> {
           return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
+                  crossAxisSpacing: 24.0,
+                  mainAxisSpacing: 40,
+                  childAspectRatio: 0.80
               ),
               itemCount: user_images.length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   color: Colors.amber,
                   child: Center(child: Image.network(user_images[index],
+                  fit: BoxFit.cover,
                   loadingBuilder: (context,child, loading){
                     if(loading==null){
                       return child;

@@ -1,15 +1,14 @@
 import 'dart:io';
 import 'dart:ui' as ui;
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_crud_demo/Helper/auth_helper.dart';
-import 'package:image_crud_demo/Screens/all_images.dart';
+import 'package:image_crud_demo/Screens/all_image.dart';
+import 'package:image_crud_demo/Screens/user_images.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,6 +24,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey _repaintkey = GlobalKey();
 
+
+  //Save Image in Device
   void convertWidgetToImage() async {
     var status = await Permission.storage.status;
     if (status.isGranted) {
@@ -39,7 +40,7 @@ class _HomePageState extends State<HomePage> {
           byteData.buffer.asUint8List(),
         );
         print(result);
-        Fluttertoast.showToast(msg: "Image Saved Successfully");
+        Fluttertoast.showToast(msg: "Image Saved Successfully in Device");
       }
     } else {
       Permission.storage.request();
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                   ),
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           GestureDetector(
             onTap: () async {
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           GestureDetector(
             child: Container(
@@ -105,7 +106,7 @@ class _HomePageState extends State<HomePage> {
             onTap: () async {
               var UniqueName = DateTime.now().microsecondsSinceEpoch.toString();
 
-              //Upload in Firebase
+              //Upload in Firebase Storage
               //1. Create Reference to Root Directory
               Reference referenceroot = FirebaseStorage.instance.ref();
               //2. Create a reference to Directory in root directory
@@ -115,12 +116,16 @@ class _HomePageState extends State<HomePage> {
               Reference referenceToImage = referenceToDir.child(UniqueName);
               //Uploading Image
               try {
+
+                //To Store Image in Firebase Storage
                 await referenceToImage.putFile(File(image!.path));
                 DownloadUrl = await referenceToImage.getDownloadURL();
                 print(DownloadUrl);
                  setState(() {});
                 Fluttertoast.showToast(msg: "Image Uploaded Successfully");
                 Fluttertoast.showToast(msg: "${DownloadUrl.toString()}");
+
+                //To Store image URL in firebase Firestore
                 Map<String, dynamic> imageinfo = {
                   "img_url":DownloadUrl.toString(),
                   "user_id": userid
@@ -133,10 +138,12 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           GestureDetector(
             onTap: () async {
+
+               //Retrive All images in List
                // CollectionReference collectionreference = firestore.collection('images');
                // collectionreference.get().then((value) => {
                //    value.docs.forEach((element) {
@@ -146,31 +153,45 @@ class _HomePageState extends State<HomePage> {
                // Fluttertoast.showToast(msg: image_list.toString());
                // print(image_list);
 
-              //To give little delay so that all images
-
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DisplayImages()));
+                      builder: (context) => DisplayUserImages()));
             },
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 50),
               height: 50,
               width: MediaQuery.of(context).size.width,
-              color: Colors.lightBlue,
-              child: Center(child: Text("Show Images")),
+              color: Colors.lightBlueAccent,
+              child: Center(child: Text("Show My Images")),
             ),
           ),
-          SizedBox(height: 20,),
+          SizedBox(height: 10,),
           GestureDetector(
-            onTap: (){
-              Authentiacation().SignOut();
+            onTap: () async{
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AllImages()));
             },
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 50),
               height: 50,
               width: MediaQuery.of(context).size.width,
               color: Colors.lightBlue,
+              child: Center(child: Text("Show All Images")),
+            ),
+          ),
+          SizedBox(height: 10,),
+          GestureDetector(
+            onTap: () async{
+              await Authentiacation().SignOut();
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 50),
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.lightBlueAccent,
               child: Center(child: Text("Sign Out")),
             ),
           ),
