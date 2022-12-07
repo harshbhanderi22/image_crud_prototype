@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_crud_demo/Helper/auth_helper.dart';
 import 'package:image_crud_demo/Screens/all_image.dart';
+import 'package:image_crud_demo/Screens/all_users.dart';
 import 'package:image_crud_demo/Screens/user_images.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
@@ -194,6 +195,22 @@ class _HomePageState extends State<HomePage> {
                 width: MediaQuery.of(context).size.width,
                 color: Colors.lightBlueAccent,
                 child: Center(child: Text("Sign Out")),
+              ),
+            ),
+            SizedBox(height: 10,),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AllUser()));
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 50),
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                color: Colors.lightBlueAccent,
+                child: Center(child: Text("Show User")),
               ),
             ),
           ],

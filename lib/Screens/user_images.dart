@@ -19,7 +19,6 @@ class _DisplayUserImagesState extends State<DisplayUserImages> {
     //To load image at init time else red screen will be displayed
     image_data=  FirebaseFirestore.instance.collection('images')
         .snapshots();
-
    }
 
   @override

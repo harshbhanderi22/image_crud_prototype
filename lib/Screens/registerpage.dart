@@ -1,26 +1,30 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_crud_demo/Helper/auth_helper.dart';
 import 'package:image_crud_demo/Screens/homepage.dart';
-import 'package:image_crud_demo/Screens/registerpage.dart';
+import 'package:image_crud_demo/Screens/loginpage.dart';
 import 'package:image_crud_demo/Utilities/routes.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
 
 
   String name="";
   bool changed =false;
   TextEditingController _emailcontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
+  TextEditingController _namecontroller = TextEditingController();
+
   final _formkey = GlobalKey<FormState>();
 
   bool ActiveConnection = false;
@@ -58,6 +62,8 @@ class _LoginPageState extends State<LoginPage> {
   }
   @override
   Widget build(BuildContext context) {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
     return SafeArea(
       child: MaterialApp(
         showPerformanceOverlay: false,
@@ -88,21 +94,50 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       children: [
                         TextFormField(
+                          controller: _namecontroller,
+                          validator: (value){
+                            if(value!.isEmpty)
+                            {
+                              return "Name cannot be Empty";
+                            }
+                            else
+                            {
+                              return null;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Enter Name",
+                            label: Text(
+                              "Name",
+                              style: TextStyle(color: Colors.black),
+                            ),
+
+                          ),
+                          onChanged: (value){
+                            setState((){
+                              name=value;
+                            });
+                          },
+                        ),
+                        SizedBox(
+                          height: 30.0,
+                        ),
+                        TextFormField(
                           controller: _emailcontroller,
                           validator: (value){
                             if(value!.isEmpty)
-                              {
-                                return "Username cannot be Empty";
-                              }
+                            {
+                              return "Username cannot be Empty";
+                            }
                             else
-                              {
-                                return null;
-                              }
+                            {
+                              return null;
+                            }
                           },
                           decoration: InputDecoration(
-                            hintText: "Enter Username",
+                            hintText: "Enter Email",
                             label: Text(
-                              "Username",
+                              "Email",
                               style: TextStyle(color: Colors.black),
                             ),
 
@@ -121,17 +156,17 @@ class _LoginPageState extends State<LoginPage> {
                           obscureText: true,
                           validator: (value){
                             if(value!.isEmpty)
-                              {
-                                return "Password cannot be empty";
-                              }
+                            {
+                              return "Password cannot be empty";
+                            }
                             if(value.length<8)
-                              {
-                                return "Password length should be atleast 8";
-                              }
+                            {
+                              return "Password length should be atleast 8";
+                            }
                             else
-                              {
-                                return null;
-                              }
+                            {
+                              return null;
+                            }
                           },
                           decoration: InputDecoration(
                             hintText: "Enter Password",
@@ -146,6 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         InkWell(
                           onTap: () async{
+
                             //Check Connectivity of User
                             CheckUserConnection();
                             if(ActiveConnection==false){
@@ -153,18 +189,41 @@ class _LoginPageState extends State<LoginPage> {
                             }
                             else{
                               //For Login
-                               if(moveToHome(context)){
-                                Future<bool> sucess = Authentiacation().login(
+                              if(moveToHome(context)){
+                                Authentiacation().Signup(
                                     _emailcontroller.text,
                                     _passwordcontroller.text
                                 );
-                                if(sucess==true){
-                                   Navigator.pushReplacement
-                                    (context, MaterialPageRoute(builder: (context)
-                                  => HomePage()));
+                                Fluttertoast.showToast(msg: "User Register "
+                                    "Successfully");
+                                Navigator.pushReplacement
+                                  (context, MaterialPageRoute(builder: (context)
+                                => LoginPage()));
+
+                                try{
+                                  Map<String,dynamic> userinfo = {
+                                    "email": FirebaseAuth.instance
+                                        .currentUser!.email,
+                                    "name":_namecontroller.text,
+                                    "uid":FirebaseAuth.instance
+                                        .currentUser!.uid,
+                                    "profile_image":'',
+                                    "followers":0,
+                                  };
+                                  firestore.collection('user').add(userinfo)
+                                      .then((value) =>
+                                      print("Data Added Successfully"));
+                                  print(userinfo);
+                                }
+                                catch(e){
+                                    print(e);
                                 }
                               }
+
+
                             }
+
+
                           },
                           child: AnimatedContainer(
                             duration: Duration(seconds: 1),
@@ -172,29 +231,20 @@ class _LoginPageState extends State<LoginPage> {
                             width: changed? 35 :120,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(changed ? 50
-                                  :10)
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(changed ? 50
+                                    :10)
                             ),
                             child: changed ? Icon(Icons.check, color: Colors.white,)
-                                :Text("Login",
+                                :Text("Register",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                              fontSize: 20.0,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold
-                            ),),
-                            ),
-                        ),
-                        SizedBox(height: 30,),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.pushReplacement
-                              (context, MaterialPageRoute(builder: (context)
-                            => RegisterPage()));
-                          },
-
-                            child: Text("Register"))
+                                  fontSize: 20.0,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold
+                              ),),
+                          ),
+                        )
                       ],
                     ),
                   ),
