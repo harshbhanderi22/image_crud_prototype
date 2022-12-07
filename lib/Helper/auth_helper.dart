@@ -1,21 +1,26 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Authentiacation {
 
-  Future<void> login(String emailAddress, String password) async{
+  Future<bool> login(String emailAddress, String password) async{
      try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailAddress,
           password: password
       );
+      return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
+        Fluttertoast.showToast(msg: "No user found for that email.");
         print('No user found for that email.');
       } else if (e.code == 'wrong-password') {
+        Fluttertoast.showToast(msg: "Wrong password provided for that user.");
         print('Wrong password provided for that user.');
       }
     }
+    return false;
   }
 
   Future<void> Signup(String emailAddress, String password) async{

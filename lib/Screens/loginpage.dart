@@ -159,15 +159,16 @@ class _LoginPageState extends State<LoginPage> {
                             }
                             else{
                               //For Login
-                              Authentiacation().login(
+                              Future<bool> sucess = Authentiacation().login(
                                   _emailcontroller.text,
                                   _passwordcontroller.text
-                              ).then((value) =>  Navigator.pushReplacement
-                                (context, MaterialPageRoute(builder: (context)
-                              => HomePage())));
+                              );
+                              if(sucess==true){
+                                Navigator.pushReplacement
+                                  (context, MaterialPageRoute(builder: (context)
+                                => HomePage()));
+                              }
                             }
-
-
 
                             //For Registration
                             // LoginAuthentiacation().Signup(
