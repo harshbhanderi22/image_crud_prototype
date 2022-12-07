@@ -168,7 +168,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               return null;
                             }
                           },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: "Enter Password",
                             label: Text(
                               "Password",
@@ -176,13 +176,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 40.0,
                         ),
                         InkWell(
                           onTap: () async{
 
                             //Check Connectivity of User
+
                             CheckUserConnection();
                             if(ActiveConnection==false){
                               Fluttertoast.showToast(msg: "Something went wrong! Check your Internet");
@@ -190,34 +191,40 @@ class _RegisterPageState extends State<RegisterPage> {
                             else{
                               //For Login
                               if(moveToHome(context)){
-                                Authentiacation().Signup(
+                                await Authentiacation().Signup(
                                     _emailcontroller.text,
                                     _passwordcontroller.text
-                                );
+                                ).then((value) {
+
+
+
+                                  try{
+                                    Map<String,dynamic> userinfo = {
+                                      "email": FirebaseAuth.instance
+                                          .currentUser!.email,
+                                      "name":_namecontroller.text,
+                                      "uid":FirebaseAuth.instance
+                                          .currentUser!.uid,
+                                      "profile_image":'',
+                                      "followers":0,
+                                    };
+                                    firestore.collection('users').add(userinfo)
+                                        .then((value) =>
+                                        print("Data Added Successfully"));
+                                    print(userinfo);
+                                  }
+                                  catch(e){
+                                    print(e);
+                                  }
+                                });
                                 Fluttertoast.showToast(msg: "User Register "
                                     "Successfully");
+                                print(" user id = ${FirebaseAuth.instance.currentUser!.uid}");
                                 Navigator.pushReplacement
                                   (context, MaterialPageRoute(builder: (context)
                                 => LoginPage()));
 
-                                try{
-                                  Map<String,dynamic> userinfo = {
-                                    "email": FirebaseAuth.instance
-                                        .currentUser!.email,
-                                    "name":_namecontroller.text,
-                                    "uid":FirebaseAuth.instance
-                                        .currentUser!.uid,
-                                    "profile_image":'',
-                                    "followers":0,
-                                  };
-                                  firestore.collection('user').add(userinfo)
-                                      .then((value) =>
-                                      print("Data Added Successfully"));
-                                  print(userinfo);
-                                }
-                                catch(e){
-                                    print(e);
-                                }
+
                               }
 
 
