@@ -195,9 +195,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                     _emailcontroller.text,
                                     _passwordcontroller.text
                                 ).then((value) {
-
-
-
                                   try{
                                     Map<String,dynamic> userinfo = {
                                       "email": FirebaseAuth.instance
@@ -206,9 +203,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                       "uid":FirebaseAuth.instance
                                           .currentUser!.uid,
                                       "profile_image":'',
-                                      "followers":0,
+                                      "followers":[],
                                     };
-                                    firestore.collection('users').add(userinfo)
+                                    firestore.collection('users').doc(FirebaseAuth.instance
+                                        .currentUser!.uid).set(userinfo)
                                         .then((value) =>
                                         print("Data Added Successfully"));
                                     print(userinfo);
