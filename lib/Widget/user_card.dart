@@ -35,8 +35,8 @@ Future<void> forList() async {
 
 
 class _UserCardState extends State<UserCard> {
-  bool follow = false;
-  @override
+
+   @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -49,6 +49,7 @@ class _UserCardState extends State<UserCard> {
   }
   @override
   Widget build(BuildContext context) {
+    bool follow = false;
     FirebaseFirestore firebase = FirebaseFirestore.instance;
     forList();
     for(int i = 0 ; i < follower.length; i++ ){

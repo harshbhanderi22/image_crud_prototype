@@ -50,7 +50,7 @@ Future<void> forList() async {
           stream: user_data,
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if(snapshot.hasData==false){
-              return CircularProgressIndicator();
+              return Center(child: CircularProgressIndicator());
             }
              return ListView.builder(
                 itemCount:  snapshot.data.docs.length,
