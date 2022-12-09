@@ -5,16 +5,22 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class UserCard extends StatelessWidget {
   UserCard({required this.name,required this.email, required this
-      .followers, required this.uid});
+      .followers, required this.uid, required this.follow});
 
   final String name;
    final String email;
   final List<dynamic> followers;
   final String uid;
+  final bool follow;
+
+
 
   @override
+
   Widget build(BuildContext context) {
     FirebaseFirestore firebase = FirebaseFirestore.instance;
+
+
 
     return  Container(
       color: Colors.yellow,
@@ -45,12 +51,15 @@ class UserCard extends StatelessWidget {
                 transaction.update(doc, {'followers': FieldValue.arrayUnion
                   ([uid])});
               }).then((value) => Fluttertoast.showToast(msg: "You Have Followed $name"));
-            },
+              print(follow);
+
+
+              },
             child: Container(
               width: 100,
               color: Colors.blue,
-              child: Center(
-                child: Text("Follow"),
+              child:  Center(
+                child: follow ? Text("Unfollow") : Text('Follow'),
               ),
             ),
           )

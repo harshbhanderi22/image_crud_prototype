@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_crud_demo/Widget/user_card.dart';
 
@@ -12,9 +13,36 @@ class AllUser extends StatefulWidget {
 class _AllUserState extends State<AllUser> {
 
   var user_data=  FirebaseFirestore.instance.collection('users').snapshots();
+  var stream1;
+   List follower = [] ;
+Future<void> forList() async {
+    stream1=  await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+   Map<String, dynamic> data = stream1.data() as Map<String, dynamic>;
+   // for(int i = 0 ; i < (data['followers']). ; i++){
+   //
+   // }
+   follower = (data['followers']);
+   print(follower);
+   print(follower.length);
+}
+
+
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // forList();
+    forList().whenComplete((){
+      setState(() {});
+    });
+    // print(follower.length);
+  }
+  late bool followornot  ;
+  @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       body: Container(
         child: StreamBuilder<Object>(
@@ -26,11 +54,24 @@ class _AllUserState extends State<AllUser> {
              return ListView.builder(
                 itemCount:  snapshot.data.docs.length,
                 itemBuilder: (context, index) {
+                  var uID = snapshot.data.docs[index]['uid'];
+
+
+
+                  for(int i = 0 ; i < follower.length; i++ ){
+                    if(uID == follower[i]){
+                      followornot = true;
+                    }else {
+                        followornot = false;
+
+                    }
+                  }
                 return UserCard(
                 name: snapshot.data.docs[index]['name'],
                 email: snapshot.data.docs[index]['email'],
                 followers: (snapshot.data.docs[index]['followers']),
-                    uid: snapshot.data.docs[index]['uid']
+                    uid: snapshot.data.docs[index]['uid'],
+                  follow: followornot ,
                 );
             });
           }
