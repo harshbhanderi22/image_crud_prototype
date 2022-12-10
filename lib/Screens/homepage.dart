@@ -130,7 +130,9 @@ class _HomePageState extends State<HomePage> {
                   //To Store image URL in firebase Firestore
                   Map<String, dynamic> imageinfo = {
                     "img_url":DownloadUrl.toString(),
-                    "user_id": userid
+                    "user_id": userid,
+                    'likes':[],
+                    'caption':null,
                   };
                   firestore.collection('images').add(imageinfo).then((value) =>
                   print("Data Added Successfully"));

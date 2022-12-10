@@ -53,23 +53,38 @@ class _DisplayUserImagesState extends State<DisplayUserImages> {
           return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                  crossAxisSpacing: 24.0,
-                  mainAxisSpacing: 40,
-                  childAspectRatio: 0.80
+                crossAxisSpacing: 24.0,
+                mainAxisSpacing: 40,
               ),
               itemCount: user_images.length,
               itemBuilder: (BuildContext context, int index) {
+                List<dynamic> like = snapshot.data.docs[index]['likes'];
+
                 return Card(
                   color: Colors.amber,
-                  child: Center(child: Image.network(user_images[index],
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context,child, loading){
-                    if(loading==null){
-                      return child;
-                    }
-                    else return Center(child: CircularProgressIndicator(),);
-                  },
-                  )),
+                  child: Container(
+                     child: Column(
+                      children: [
+                        Image.network(user_images[index],
+                              height: 150,
+                              width: MediaQuery.of(context).size.width,
+                              fit: BoxFit.fitWidth,
+                              loadingBuilder: (context,child, loading){
+                                if(loading==null){
+                                  return child;
+                                }
+                                else return Center(child: CircularProgressIndicator(),);
+                              },
+                  ),
+                        Row(
+                         children: [
+                           Icon(Icons.thumb_up_alt),
+                           Text("${like.length}")
+                         ],
+                        )
+                      ],
+                    ),
+                  ),
                 );
               }
           );

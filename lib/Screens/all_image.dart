@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_crud_demo/Widget/image_card.dart';
 
 class AllImages extends StatefulWidget {
   const AllImages({Key? key}) : super(key: key);
@@ -26,22 +27,16 @@ class _AllImagesState extends State<AllImages> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 24.0,
                     mainAxisSpacing: 40,
-                    childAspectRatio: 0.80
                 ),
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (BuildContext context, int index) {
                   String url = snapshot.data.docs[index]['img_url'];
+                  String docid = snapshot.data.docs[index].id;
+                  List<dynamic> like = snapshot.data.docs[index]['likes'];
                   return Card(
                     color: Colors.amber,
-                    child: Center(child: Image.network(url,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context,child, loading){
-                        if(loading==null){
-                          return child;
-                        }
-                        else return Center(child: CircularProgressIndicator(),);
-                      },
-                    )),
+                    child: Center(child: ImageCard(url: url, image_doc:
+                    docid, like_list: like, )),
                   );
                 }
             );
