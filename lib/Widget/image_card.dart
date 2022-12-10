@@ -4,12 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../Screens/commentsPages.dart';
+
+
 class ImageCard extends StatefulWidget {
 
-  ImageCard({required this.url, required this.image_doc, required this.like_list});
+  ImageCard({required this.url, required this.image_doc, required this.like_list , required this.ownerId});
   final String url;
   final String image_doc;
   final List<dynamic> like_list;
+  final String ownerId;
 
   @override
   State<ImageCard> createState() => _ImageCardState();
@@ -29,10 +33,11 @@ class _ImageCardState extends State<ImageCard> {
       });
     }
     return Container(
+
         child: Column(
          children: [
            Image.network(widget.url,
-             height: 150,
+             height: 140,
              width: MediaQuery.of(context).size.width,
              fit: BoxFit.fitWidth,
              loadingBuilder: (context,child, loading){
@@ -79,12 +84,33 @@ class _ImageCardState extends State<ImageCard> {
                    ),
                    Text("${widget.like_list.length}")
                  ],
-               )
+               ),
+               Row(
+                 children: [
+                   InkWell(
+                       onTap: () {
+                         showComments(context , postId: widget.image_doc , ownerId: widget.ownerId , mediaUrl: widget.url);
+
+                   },child: Icon(Icons.comment)),
+                 ],
+               ),
              ],
            )
          ],
        ),
     );
   }
+}
+
+showComments(BuildContext context , {required String postId,required String ownerId , required String mediaUrl}){
+
+
+  Navigator.push(context, MaterialPageRoute(builder:  (context) {
+    return CommentsPages(
+      postId: postId,
+      postOwnerId: ownerId,
+      postMediaUrl: mediaUrl,
+    );
+  }));
 }
 

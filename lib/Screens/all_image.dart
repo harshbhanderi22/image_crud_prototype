@@ -32,11 +32,13 @@ class _AllImagesState extends State<AllImages> {
                 itemBuilder: (BuildContext context, int index) {
                   String url = snapshot.data.docs[index]['img_url'];
                   String docid = snapshot.data.docs[index].id;
+                  String ownerId = snapshot.data.docs[index]['user_id'];
                   List<dynamic> like = snapshot.data.docs[index]['likes'];
                   return Card(
                     color: Colors.amber,
                     child: Center(child: ImageCard(url: url, image_doc:
-                    docid, like_list: like, )),
+                    docid, like_list: like,
+                    ownerId: ownerId,)),
                   );
                 }
             );

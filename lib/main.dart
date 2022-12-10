@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_crud_demo/Screens/homepage.dart';
@@ -12,6 +13,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // FirebaseStorage.instance.settings(timestampsInSnapshotsEnabled: true).then((_) {
+  //   print("TimeStamp enabled in snapshots\n");
+  // },onError: (_) {
+  //   print("TimeStamp not enabled in snapshots\n");
+  // });
   runApp(MyApp());
 }
 
